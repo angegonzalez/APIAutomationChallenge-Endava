@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
         features = {"src/test/resources/features"},
         glue = {"step_definitions", "common"},
         plugin = {"pretty", "json:target/cucumber/cucumber.json"},
-        tags = "@Movies and @rating and not @ignore"
+        tags = "@Authentication"
 )
 public class Runner {
 }

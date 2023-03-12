@@ -9,7 +9,7 @@ public class MoviesPage extends BasePage {
     private final String sessionID = dotenv.get("SESSION_ID");
 
     public Response getMovieDetails(String movieID) {
-        return requestSpecification.when().get("/movie/" + movieID);
+        return requestSpecification.get("/movie/" + movieID);
     }
 
     public Response rateMovie(String movieID, RateMovieRequestBody rateMovieRequestBody) {

@@ -1,9 +1,7 @@
 package pages.authentication;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.response.Response;
 import models.CreateSessionRequestBody;
 import models.ValidateLoginRequestBody;
 import org.apache.log4j.Logger;
@@ -12,9 +10,6 @@ import pages.BasePage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Objects;
-
-import static io.restassured.RestAssured.given;
 
 public class AuthenticationPage extends BasePage {
 
@@ -23,7 +18,7 @@ public class AuthenticationPage extends BasePage {
     private String validatedRequestToken;
     private String sessionID;
     public void createRequestToken() {
-        requestToken = requestSpecification.when().get("/authentication/token/new").
+        requestToken = requestSpecification.get("/authentication/token/new").
                 getBody().jsonPath().get("request_token");
     }
 
@@ -31,7 +26,7 @@ public class AuthenticationPage extends BasePage {
         ValidateLoginRequestBody validateLoginRequestBody =
                 new ValidateLoginRequestBody(username, password, requestToken);
         validatedRequestToken = requestSpecification
-                .and().body(validateLoginRequestBody).contentType(ContentType.JSON)
+                .body(validateLoginRequestBody).contentType(ContentType.JSON)
                 .post("/authentication/token/validate_with_login").getBody().jsonPath().get("request_token");
     }
 
@@ -39,14 +34,14 @@ public class AuthenticationPage extends BasePage {
         validatedRequestToken = requestToken;
     }
 
-    public ValidatableResponse createSession() {
+    public Response createSession() {
         CreateSessionRequestBody createSessionRequestBody = new CreateSessionRequestBody(validatedRequestToken);
-        ValidatableResponse validatableResponse = requestSpecification.body(createSessionRequestBody)
-                .contentType(ContentType.JSON).post("/authentication/session/new").then();
-        sessionID = validatableResponse.extract().body().jsonPath().get("session_id");
+        Response response = requestSpecification.body(createSessionRequestBody)
+                .contentType(ContentType.JSON).post("/authentication/session/new");
+        sessionID = response.body().jsonPath().get("session_id");
         if (sessionID != null)
             writeSessionID();
-        return validatableResponse;
+        return response;
     }
 
     private void writeSessionID() {

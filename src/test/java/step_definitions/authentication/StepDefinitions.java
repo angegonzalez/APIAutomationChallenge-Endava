@@ -1,10 +1,11 @@
 package step_definitions.authentication;
+
 import common.StatusAssertions;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.response.ValidatableResponse;
+import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import pages.authentication.AuthenticationPage;
 
@@ -32,18 +33,18 @@ public class StepDefinitions extends StatusAssertions {
     }
     @Then("the user successfully creates a session")
     public void userSuccessfullyCreatesASession(){
-        ValidatableResponse validatableResponse = authenticationPage.createSession();
-        assertOK(validatableResponse.extract().response());
-        Boolean isSuccess = Boolean.parseBoolean(validatableResponse.extract().body().jsonPath().get("success").toString());
+        Response response = authenticationPage.createSession();
+        assertOK(response);
+        Boolean isSuccess = Boolean.parseBoolean(response.body().jsonPath().get("success").toString());
         Assertions.assertThat(isSuccess).isTrue();
     }
     @Then("the user can't create a session")
     public void userCannotCreateASession(){
-        ValidatableResponse validatableResponse = authenticationPage.createSession();
-        assertUnauthorized(validatableResponse.extract().response());
-        Boolean isSuccess = Boolean.parseBoolean(validatableResponse.extract().body().jsonPath().get("success").toString());
-        Boolean isFailure = Boolean.parseBoolean(validatableResponse.extract().body().jsonPath().get("failure").toString());
-        String statusMessage = validatableResponse.extract().body().jsonPath().get("status_message").toString();
+        Response response = authenticationPage.createSession();
+        assertUnauthorized(response);
+        Boolean isSuccess = Boolean.parseBoolean(response.body().jsonPath().get("success").toString());
+        Boolean isFailure = Boolean.parseBoolean(response.body().jsonPath().get("failure").toString());
+        String statusMessage = response.body().jsonPath().get("status_message").toString();
         Assertions.assertThat(isSuccess).isFalse();
         Assertions.assertThat(isFailure).isTrue();
         Assertions.assertThat(statusMessage).isEqualTo("Session denied.");
